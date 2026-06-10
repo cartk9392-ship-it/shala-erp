@@ -148,7 +148,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="mt-8 px-4 border-t border-white/5 pt-6">
           <button
             onClick={handleInstallClick}
-            className="flex items-center w-full px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20 transition-all duration-300 group"
+            className="flex items-center w-full px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20 transition-all duration-300 group cursor-pointer"
           >
             <Download className="w-5 h-5 mr-3 flex-shrink-0 transition-transform duration-300 group-hover:translate-y-0.5" />
             <span className="text-[14px] font-medium tracking-wide">Download App</span>
