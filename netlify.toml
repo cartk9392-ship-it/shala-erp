@@ -1,0 +1,10 @@
+[build]
+  base = "client"
+  publish = "dist"
+  command = "npm run build"
+
+# Handle SPA routing so React Router redirects work properly on refresh
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
