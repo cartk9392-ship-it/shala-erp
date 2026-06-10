@@ -13,12 +13,38 @@ import {
   Award,
   CalendarClock,
   GraduationCap,
-  LineChart
+  LineChart,
+  Download
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { userData, unreadNoticeCount } = useAuth();
   const role = userData?.role || 'parent'; // default fallback
+  const [deferredPrompt, setDeferredPrompt] = React.useState(null);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      }
+      setDeferredPrompt(null);
+    } else {
+      alert("To install Shala ERP as an app:\n\n1. On Desktop: Click the 'Install' icon in your browser's address bar (near the bookmark star).\n2. On Mobile: Tap the browser menu (three dots) and select 'Add to Home screen'.");
+    }
+  };
 
   const adminLinks = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -117,6 +143,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             );
           })}
         </ul>
+
+        {/* Download App Button */}
+        <div className="mt-8 px-4 border-t border-white/5 pt-6">
+          <button
+            onClick={handleInstallClick}
+            className="flex items-center w-full px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20 transition-all duration-300 group"
+          >
+            <Download className="w-5 h-5 mr-3 flex-shrink-0 transition-transform duration-300 group-hover:translate-y-0.5" />
+            <span className="text-[14px] font-medium tracking-wide">Download App</span>
+          </button>
+        </div>
       </div>
     </div>
   );
