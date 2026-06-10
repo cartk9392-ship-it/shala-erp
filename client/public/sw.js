@@ -8,6 +8,11 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (e) => {
-  // Pass-through fetch handler for basic PWA offline satisfaction
+self.addEventListener('fetch', (event) => {
+  // Call respondWith to satisfy Chrome PWA installability requirements
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return new Response("Offline mode - Shala ERP");
+    })
+  );
 });
