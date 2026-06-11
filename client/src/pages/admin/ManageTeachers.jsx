@@ -172,7 +172,7 @@ const ManageTeachers = () => {
                   <button onClick={() => handleEdit(teacher)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
                   <button 
                     onClick={() => handleDelete(teacher.id)} 
-                    className={`p-2 rounded-lg transition-all ${confirmDeleteId === teacher.id ? 'bg-red-500 text-white text-[10px] font-bold px-3' : 'text-slate-400 hover:text-red-500 hover:bg-red-50'}`}
+                    className={`p-2 rounded-lg transition-all ${confirmDeleteId === teacher.id ? 'bg-red-500 text-white text-[10px] font-bold px-3' : 'text-red-500 hover:text-red-600 hover:bg-red-50'}`}
                   >
                     {confirmDeleteId === teacher.id ? 'CONFIRM?' : <Trash2 className="w-4 h-4" />}
                   </button>

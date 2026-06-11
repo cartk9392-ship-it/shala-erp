@@ -286,7 +286,7 @@ export default function ExamSchedule() {
                       {formSubjects.length > 1 && (
                         <button
                           onClick={() => removeSubjectRow(idx)}
-                          className="mt-5 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                          className="mt-5 p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -375,7 +375,7 @@ export default function ExamSchedule() {
                     {/* Delete button */}
                     <button
                       onClick={e => { e.stopPropagation(); setDeleteConfirm(schedule.id); }}
-                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                      className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                       title="Delete Schedule"
                     >
                       <Trash2 className="w-4 h-4" />

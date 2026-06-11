@@ -286,7 +286,7 @@ const ManageStudents = () => {
                     <button onClick={() => handleEditClick(student)} className="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" onClick={() => handleDelete(student.id)}>
+                    <button className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" onClick={() => handleDelete(student.id)}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>

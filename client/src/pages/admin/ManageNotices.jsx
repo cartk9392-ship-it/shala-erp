@@ -92,7 +92,7 @@ const ManageNotices = () => {
                 <p className="text-xs text-slate-400">{notice.date}</p>
               </div>
             </div>
-            <button onClick={() => handleDelete(notice.id)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition">
+            <button onClick={() => handleDelete(notice.id)} className="p-2 text-red-500 md:text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>

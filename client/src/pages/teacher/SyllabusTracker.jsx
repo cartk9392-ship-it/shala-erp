@@ -269,7 +269,7 @@ export default function SyllabusTracker() {
                     onClick={() => doDeleteSubject(sub)}
                     disabled={saving}
                     title={`Delete ${sub}`}
-                    className="flex-shrink-0 w-9 rounded-2xl border border-red-100 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 flex items-center justify-center shadow-sm">
+                    className="flex-shrink-0 w-9 rounded-2xl border border-red-100 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200 flex items-center justify-center shadow-sm">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -432,7 +432,7 @@ export default function SyllabusTracker() {
                               <button onClick={()=>setEditingId(topic.topicId)} className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition">
                                 <Edit3 className="w-3.5 h-3.5"/>
                               </button>
-                              <button onClick={()=>deleteTopic(topic.topicId)} className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                              <button onClick={()=>deleteTopic(topic.topicId)} className="p-1.5 text-red-500 md:text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
                                 <Trash2 className="w-3.5 h-3.5"/>
                               </button>
                             </div>

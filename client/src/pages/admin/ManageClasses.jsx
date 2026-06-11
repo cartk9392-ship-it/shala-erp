@@ -91,7 +91,7 @@ const ManageClasses = () => {
               className={`absolute top-4 right-4 p-2 rounded-lg transition-all ${
                 confirmDeleteId === cls.id 
                   ? 'bg-red-500 text-white text-[10px] font-bold px-3 opacity-100' 
-                  : 'text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100'
+                  : 'text-red-500 md:text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100'
               }`}
             >
               {confirmDeleteId === cls.id ? 'Confirm?' : <Trash2 className="w-4 h-4" />}

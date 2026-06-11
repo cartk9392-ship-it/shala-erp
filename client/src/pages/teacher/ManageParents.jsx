@@ -184,7 +184,7 @@ const ManageParents = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button 
-                      className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition" 
+                      className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition" 
                       onClick={() => handleDelete(parent.id)}
                     >
                       <Trash2 className="w-4 h-4" />

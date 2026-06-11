@@ -175,14 +175,17 @@ const Homework = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Homework Management</h1>
           <p className="text-slate-500">Assign and track homework for your class</p>
         </div>
         <button 
-          onClick={() => setShowForm(!showForm)}
-          className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition flex items-center shadow-md"
+          onClick={() => {
+            setFormData({ subject: '', title: '', dueDate: '' });
+            setShowForm(!showForm);
+          }}
+          className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition flex items-center shadow-md w-full sm:w-auto justify-center"
         >
           <Plus className="w-4 h-4 mr-2" /> Assign Homework
         </button>
@@ -232,25 +235,25 @@ const Homework = () => {
               <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mr-4 shrink-0">
                 <FileText className="w-6 h-6" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <span className="inline-block px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md mb-2">{hw.subject}</span>
-                <h3 className="text-lg font-bold text-slate-800">{hw.title}</h3>
-                <div className="flex items-center text-sm text-slate-500 mt-2 space-x-4">
+                <h3 className="text-lg font-bold text-slate-800 break-words">{hw.title}</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center text-sm text-slate-500 mt-2 gap-2 sm:gap-4">
                   <span className="flex items-center"><Calendar className="w-4 h-4 mr-1" /> Assigned: {hw.dateAssigned}</span>
                   <span className="flex items-center text-amber-600"><Calendar className="w-4 h-4 mr-1" /> Due: {hw.dueDate}</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between md:justify-end space-x-2 mt-4 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto">
               <button 
                 onClick={() => setCheckingHomework(hw)}
-                className="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition flex items-center text-sm"
+                className="flex-1 md:flex-initial justify-center bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition flex items-center text-sm"
               >
                 <CheckCircle className="w-4 h-4 mr-2" /> Check Homework
               </button>
               <button 
                 onClick={() => handleDelete(hw.id)}
-                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
