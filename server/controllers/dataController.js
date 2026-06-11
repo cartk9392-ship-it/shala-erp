@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+// Auto push helper — sends push when notice is created
+const { sendPushToRole } = require('./pushController');
 const Student = require('../models/Student');
 const Class = require('../models/Class');
 const Notice = require('../models/Notice');
@@ -90,6 +92,23 @@ const addDocument = async (req, res) => {
     if (!Model) return res.status(404).json({ message: `Collection '${collection}' not found` });
 
     const doc = await Model.create(req.body);
+
+    // ── Auto Push Notification when Admin creates a Notice ──
+    if (collection === 'notices' && doc.title) {
+      const targetRole = doc.target || 'All';  // 'All' | 'Teachers' | 'Parents'
+      const noticeUrl =
+        targetRole === 'Teachers' ? '/teacher/notices' :
+        targetRole === 'Parents'  ? '/parent/notices'  : '/teacher/notices';
+
+      // Fire & forget — don't block the HTTP response
+      sendPushToRole(
+        `📢 New School Notice`,
+        doc.title,
+        noticeUrl,
+        targetRole
+      ).catch((e) => console.error('Push send error (non-fatal):', e.message));
+    }
+
     res.status(201).json(doc);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -19,6 +19,7 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/data', require('./routes/dataRoutes'));
+app.use('/api/push', require('./routes/pushRoutes'));   // ← Web Push Notifications
 
 // Start server
 const startServer = async () => {
