@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Key, Trash2, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocuments, getDocumentsWhere, addDocument, deleteDocument, COLLECTIONS } from '../../api/apiService';
 
 const ManageParents = () => {
+  const { showToast, showConfirm } = useDialog();
   const { userData } = useAuth();
   const [parents, setParents] = useState([]);
   const [students, setStudents] = useState([]);
@@ -44,7 +46,7 @@ const ManageParents = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const selectedStudent = students.find(s => s.id.toString() === formData.studentId);
-    if (!selectedStudent) { alert('Please select a student.'); return; }
+    if (!selectedStudent) { showToast('Please select a student.', 'warning'); return; }
     try {
       const newParent = {
         ...formData,
@@ -57,19 +59,30 @@ const ManageParents = () => {
       setParents(prev => [...prev, savedParent]);
       setFormData({ name: '', studentId: '', username: '', password: '' });
       setShowForm(false);
+      showToast('Parent login created successfully!', 'success');
     } catch (error) {
       console.error('Error creating parent account:', error);
-      alert('Error: ' + error.message);
+      showToast('Error: ' + error.message, 'error');
     }
   };
 
   const handleDelete = async (id) => {
+    const parent = parents.find(p => p.id === id);
+    const ok = await showConfirm({
+      title: 'Delete Parent Account?',
+      message: `Are you sure you want to delete the parent login account for "${parent?.name || 'this parent'}"? This action cannot be undone.`,
+      confirmText: 'Delete Account',
+      danger: true
+    });
+    if (!ok) return;
+
     try {
       await deleteDocument(COLLECTIONS.USERS, id);
       setParents(prev => prev.filter(u => u.id !== id));
+      showToast('Parent account deleted.', 'info');
     } catch (error) {
       console.error('Error deleting parent account:', error);
-      alert('Delete failed: ' + error.message);
+      showToast('Delete failed: ' + error.message, 'error');
     }
   };
 

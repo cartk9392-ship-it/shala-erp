@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 import { getDocuments, getDocumentsWhere, addDocument, updateDocument, deleteDocument, COLLECTIONS } from '../../api/apiService';
+import { useDialog } from '../../context/DialogContext';
 
 const ManageTeachers = () => {
+  const { showToast, showConfirm } = useDialog();
   const [teachers, setTeachers] = useState([]);
   const [classes, setClasses] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -40,7 +42,7 @@ const ManageTeachers = () => {
       handleCancel();
     } catch (error) {
       console.error('Error saving teacher:', error);
-      alert('Error saving teacher. Please try again.');
+      showToast('Error saving teacher. Please try again.', 'error');
     }
   };
  
@@ -62,25 +64,21 @@ const ManageTeachers = () => {
     setShowForm(false);
   };
 
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
-  const handleDelete = async (id) => {
-    if (confirmDeleteId !== id) {
-      setConfirmDeleteId(id);
-      // Auto-reset after 3 seconds if not confirmed
-      setTimeout(() => setConfirmDeleteId(null), 3000);
-      return;
-    }
-
+  const handleDelete = async (id, name) => {
+    const ok = await showConfirm({
+      title: 'Delete Teacher?',
+      message: `Are you sure you want to remove "${name}"? This action cannot be undone.`,
+      confirmText: 'Yes, Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteDocument(COLLECTIONS.USERS, id);
       setTeachers(prev => prev.filter(t => t.id !== id));
-      setConfirmDeleteId(null);
-      alert('Teacher account removed successfully.');
+      showToast('Teacher account removed successfully.', 'success');
     } catch (error) {
       console.error('Delete error:', error);
-      alert(`Error: ${error.message}`);
-      setConfirmDeleteId(null);
+      showToast(`Error: ${error.message}`, 'error');
     }
   };
 
@@ -171,10 +169,10 @@ const ManageTeachers = () => {
                 <div className="flex items-center gap-1 shrink-0">
                   <button onClick={() => handleEdit(teacher)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"><Edit2 className="w-4 h-4" /></button>
                   <button 
-                    onClick={() => handleDelete(teacher.id)} 
-                    className={`p-2 rounded-lg transition-all ${confirmDeleteId === teacher.id ? 'bg-red-500 text-white text-[10px] font-bold px-3' : 'text-red-500 hover:text-red-600 hover:bg-red-50'}`}
+                    onClick={() => handleDelete(teacher.id, teacher.name)} 
+                    className="p-2 rounded-lg transition-all text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
-                    {confirmDeleteId === teacher.id ? 'CONFIRM?' : <Trash2 className="w-4 h-4" />}
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -212,10 +210,10 @@ const ManageTeachers = () => {
                   <td className="px-6 py-4 text-right"><div className="flex items-center justify-end gap-1">
                     <button onClick={() => handleEdit(teacher)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"><Edit2 className="w-4 h-4" /></button>
                     <button 
-                      onClick={() => handleDelete(teacher.id)} 
-                      className={`p-2 rounded-xl transition-all ${confirmDeleteId === teacher.id ? 'bg-red-500 text-white text-[10px] font-bold px-4' : 'text-slate-400 hover:text-red-500 hover:bg-red-50'}`}
+                      onClick={() => handleDelete(teacher.id, teacher.name)} 
+                      className="p-2 rounded-xl transition-all text-slate-400 hover:text-red-500 hover:bg-red-50"
                     >
-                      {confirmDeleteId === teacher.id ? 'CONFIRM?' : <Trash2 className="w-4 h-4" />}
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div></td>
                 </tr>

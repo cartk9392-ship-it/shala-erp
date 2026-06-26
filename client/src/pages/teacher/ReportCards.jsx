@@ -3,10 +3,12 @@ import { Download, FileText, User, Award, CheckCircle, XCircle, Printer, Refresh
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocuments, getDocumentsWhere, getDocument, COLLECTIONS } from '../../api/apiService';
 
 const ReportCards = () => {
   const { userData } = useAuth();
+  const { showToast } = useDialog();
   const [students, setStudents] = useState([]);
   const [availableExams, setAvailableExams] = useState([]);
   const [allMarks, setAllMarks] = useState([]);
@@ -251,7 +253,7 @@ const ReportCards = () => {
       doc.save(`Marksheet_${reportData.student.name.replace(/\s+/g, '_')}_${selectedExam.replace(/\s+/g, '_')}.pdf`);
     } catch (e) {
       console.error(e);
-      alert("Error generating PDF");
+      showToast('Error generating PDF', 'error');
     }
   };
 

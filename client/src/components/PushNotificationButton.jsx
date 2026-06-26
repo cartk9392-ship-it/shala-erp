@@ -4,13 +4,31 @@
 // Drop this anywhere — Teacher Dashboard, Admin Settings, etc.
 // ============================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, BellOff, BellRing, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { usePushNotifications } from '../hooks/usePushNotifications';
+import { useDialog } from '../context/DialogContext';
 
 const PushNotificationButton = ({ compact = false }) => {
   const { status, error, subscribe, unsubscribe, triggerTestNotification } = usePushNotifications();
   const [showInfo, setShowInfo] = useState(false);
+  const { showToast } = useDialog();
+
+  // Track previous status to show toasts when it changes
+  const [prevStatus, setPrevStatus] = useState(status);
+
+  useEffect(() => {
+    if (prevStatus === 'loading' && status === 'subscribed') {
+      showToast('Notifications enabled successfully!', 'success');
+    } else if (prevStatus === 'subscribed' && status === 'default') {
+      showToast('Notifications turned off.', 'info');
+    } else if (status === 'denied' && prevStatus !== 'denied') {
+      showToast('Notifications are blocked by your browser settings.', 'warning');
+    } else if (status === 'error' && prevStatus === 'loading') {
+      showToast('Failed to enable notifications.', 'error');
+    }
+    setPrevStatus(status);
+  }, [status, prevStatus, showToast]);
 
   // ── Config for each state ────────────────────────────────
   const stateConfig = {
@@ -114,7 +132,10 @@ const PushNotificationButton = ({ compact = false }) => {
       {/* Test button — only visible when subscribed */}
       {status === 'subscribed' && (
         <button
-          onClick={triggerTestNotification}
+          onClick={() => {
+            triggerTestNotification();
+            showToast('Test notification triggered!', 'info');
+          }}
           className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 px-1 transition-colors"
         >
           <Bell className="w-3.5 h-3.5" />

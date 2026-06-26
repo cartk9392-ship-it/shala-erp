@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Edit2, UserPlus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocumentsWhere, addDocument, updateDocument, deleteDocument, subscribeToCollectionWhere, COLLECTIONS } from '../../api/apiService';
 
 const initialFormState = {
@@ -37,6 +38,7 @@ const FormSection = ({ title, children, defaultOpen = true }) => {
 
 const ManageStudents = () => {
   const { userData } = useAuth();
+  const { showToast, showConfirm } = useDialog();
   const [students, setStudents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(initialFormState);
@@ -66,16 +68,16 @@ const ManageStudents = () => {
       if (editingStudentId) {
         await updateDocument(COLLECTIONS.STUDENTS, editingStudentId, formData);
         setStudents(prev => prev.map(s => s.id === editingStudentId ? { ...s, ...formData } : s));
-        alert('Student record updated successfully!');
+        showToast('Student record updated successfully!', 'success');
       } else {
         const newStudent = await addDocument(COLLECTIONS.STUDENTS, { ...formData, class: myClass });
         setStudents(prev => [...prev, newStudent]);
-        alert('Student record added successfully!');
+        showToast('Student record added successfully!', 'success');
       }
       setFormData(initialFormState);
       setEditingStudentId(null);
       setShowForm(false);
-    } catch (e) { console.error(e); alert('Error saving student.'); }
+    } catch (e) { console.error(e); showToast('Error saving student.', 'error'); }
   };
 
   const handleEditClick = (student) => {
@@ -92,13 +94,19 @@ const ManageStudents = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if(window.confirm('Are you sure you want to delete this student record?')) {
-      try {
-        await deleteDocument(COLLECTIONS.STUDENTS, id);
-        setStudents(prev => prev.filter(s => s.id !== id));
-      } catch (e) { console.error(e); }
-    }
+  const handleDelete = async (id, name) => {
+    const ok = await showConfirm({
+      title: 'Delete Student Record?',
+      message: `Are you sure you want to delete the record of "${name}"? This cannot be undone.`,
+      confirmText: 'Yes, Delete',
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await deleteDocument(COLLECTIONS.STUDENTS, id);
+      setStudents(prev => prev.filter(s => s.id !== id));
+      showToast('Student record deleted.', 'success');
+    } catch (e) { console.error(e); }
   };
 
   const handleChange = (e) => {
@@ -286,7 +294,7 @@ const ManageStudents = () => {
                     <button onClick={() => handleEditClick(student)} className="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" onClick={() => handleDelete(student.id)}>
+                    <button className="p-2 text-red-500 md:text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" onClick={() => handleDelete(student.id, student.name)}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>

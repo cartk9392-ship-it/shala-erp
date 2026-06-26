@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import {
   CalendarDays, Plus, Trash2, Save, Edit2, CheckCircle,
   Clock, BookOpen, AlertCircle, ChevronDown, ChevronUp, X, RefreshCw
@@ -49,6 +50,7 @@ const fmtDate = (d) => {
 export default function ExamSchedule() {
   const { userData } = useAuth();
   const myClass = userData?.classAssigned;
+  const { showToast, showConfirm } = useDialog();
 
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -115,9 +117,9 @@ export default function ExamSchedule() {
 
   // ── Save schedule ─────────────────────────────────────────────────────────
   const handleSave = async () => {
-    if (!formExamName.trim()) { alert('Exam name required'); return; }
+    if (!formExamName.trim()) { showToast('Exam name required', 'warning'); return; }
     if (formSubjects.some(s => !s.subject || !s.date)) {
-      alert('Please fill subject name and date for all rows'); return;
+      showToast('Please fill subject name and date for all rows', 'warning'); return;
     }
 
     setSaving(true);
@@ -142,7 +144,7 @@ export default function ExamSchedule() {
       await loadSchedules();
     } catch (err) {
       console.error('Save error:', err);
-      alert('Failed to save schedule. Try again.');
+      showToast('Failed to save schedule. Try again.', 'error');
     } finally {
       setSaving(false);
     }
@@ -155,7 +157,7 @@ export default function ExamSchedule() {
       setDeleteConfirm(null);
       setSchedules(prev => prev.filter(s => s.id !== id));
     } catch (err) {
-      alert('Delete failed. Try again.');
+      showToast('Delete failed. Try again.', 'error');
     }
   };
 

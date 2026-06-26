@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, IndianRupee, Plus, X, FileText, CheckCircle, AlertCircle, Settings, Download } from 'lucide-react';
 import { getDocuments, getDocument, addDocument, updateDocument, COLLECTIONS } from '../../api/apiService';
+import { useDialog } from '../../context/DialogContext';
 
 const ManageFees = () => {
+  const { showToast } = useDialog();
   const [activeTab, setActiveTab] = useState('collection'); // 'collection' or 'structure'
   
   const [students, setStudents] = useState([]);
@@ -83,10 +85,10 @@ const ManageFees = () => {
       await updateDocument(COLLECTIONS.FEE_STRUCTURES, 'global_all', { structures: updatedStructures });
       setFeeStructures(updatedStructures);
       setEditingStructure(null);
-      alert('Fee structure updated successfully!');
+      showToast('Fee structure updated successfully!', 'success');
     } catch (error) {
       console.error('Error saving fee structure:', error);
-      alert('Failed to save fee structure. Please check permissions.');
+      showToast('Failed to save fee structure. Please check permissions.', 'error');
     }
   };
 
@@ -108,7 +110,7 @@ const ManageFees = () => {
       setIsPaymentModalOpen(false);
       setSelectedStudent(null);
       setPaymentAmount('');
-      alert('Payment recorded successfully!');
+      showToast('Payment recorded successfully!', 'success');
     } catch (error) {
       console.error('Error recording payment:', error);
     }

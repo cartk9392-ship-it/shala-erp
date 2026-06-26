@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import PushNotificationButton from './PushNotificationButton';
 import { 
   LayoutDashboard, 
@@ -20,6 +21,7 @@ import {
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { userData, unreadNoticeCount } = useAuth();
+  const { showToast } = useDialog();
   const role = userData?.role || 'parent'; // default fallback
   const [deferredPrompt, setDeferredPrompt] = React.useState(null);
 
@@ -43,7 +45,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       }
       setDeferredPrompt(null);
     } else {
-      alert("To install Shala ERP as an app:\n\n1. On Desktop: Click the 'Install' icon in your browser's address bar (near the bookmark star).\n2. On Mobile: Tap the browser menu (three dots) and select 'Add to Home screen'.");
+      showToast('To install: Click the Install icon in your browser address bar, or use browser menu > Add to Home screen.', 'info');
     }
   };
 

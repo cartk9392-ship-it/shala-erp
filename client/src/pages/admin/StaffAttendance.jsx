@@ -3,8 +3,10 @@ import { Calendar, Search, CheckCircle2, XCircle, Clock, Save, FileText, Downloa
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getDocuments, addDocument, getDocument, updateDocument, COLLECTIONS } from '../../api/apiService';
+import { useDialog } from '../../context/DialogContext';
 
 const StaffAttendance = () => {
+  const { showToast } = useDialog();
   const [teachers, setTeachers] = useState([]);
   const [attendance, setAttendance] = useState({}); // For daily: { teacherId: status }
   const [activeTab, setActiveTab] = useState('daily');
@@ -65,7 +67,7 @@ const StaffAttendance = () => {
         });
       });
       await Promise.all(promises);
-      setSuccess('Attendance saved successfully!');
+      showToast('Staff attendance saved successfully!', 'success');
       setTimeout(() => setSuccess(''), 3000);
       await loadData(); // Reload fresh records from server
     } catch (error) {
@@ -188,7 +190,7 @@ const StaffAttendance = () => {
       doc.save(`Attendance_${monthName}_${year}.pdf`);
     } catch (err) {
       console.error(err);
-      alert("Error: PDF Generation failed. Please check console.");
+      showToast('Error: PDF Generation failed.', 'error');
     }
   };
 

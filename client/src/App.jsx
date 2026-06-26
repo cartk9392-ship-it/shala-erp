@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DialogProvider } from './context/DialogContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 // Layout & Common
@@ -59,9 +60,10 @@ const RootRedirect = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
+    <DialogProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
           <Route path="/login" element={<Login />} />
           
           <Route path="/" element={<RootRedirect />} />
@@ -133,8 +135,9 @@ function App() {
             />
           </Route>
         </Routes>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </DialogProvider>
   );
 }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { Save, ClipboardList, RefreshCw, Download, Award, TrendingUp, Users, AlertCircle, Trash2, CheckCircle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -10,6 +11,7 @@ const buildDocId = (className, examName, subject) =>
   `${className}_${examName.trim()}_${subject.trim()}`.replace(/\s+/g, '_');
 
 const ExamMarks = () => {
+  const { showToast, showConfirm } = useDialog();
   const { userData } = useAuth();
 
   // Test Configuration State
@@ -155,7 +157,7 @@ const ExamMarks = () => {
   const handleSave = async () => {
     const myClass = userData?.classAssigned;
     if (!myClass || !examName.trim() || !subject.trim()) {
-      alert('Please fill in Exam Name, Subject, and Max Marks.');
+      showToast('Please fill in Exam Name, Subject, and Max Marks.', 'warning');
       return;
     }
 
@@ -215,7 +217,7 @@ const ExamMarks = () => {
       setShowDeleteConfirm(false);
     } catch (error) {
       console.error('Error deleting test:', error);
-      alert('Failed to delete test record.');
+      showToast('Failed to delete test record.', 'error');
     } finally {
       setIsDeleting(false);
     }
@@ -236,7 +238,7 @@ const ExamMarks = () => {
       await loadHistory();
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Delete failed: ' + err.message);
+      showToast('Delete failed: ' + err.message, 'error');
     }
   };
 
@@ -279,7 +281,7 @@ const ExamMarks = () => {
       doc.save(`Result_${examName.replace(/\s+/g, '_')}_${subject}.pdf`);
     } catch (e) {
       console.error(e);
-      alert('Failed to generate PDF report.');
+      showToast('Failed to generate PDF report.', 'error');
     }
   };
 

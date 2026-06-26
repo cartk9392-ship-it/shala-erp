@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Save, Building, Mail, Phone, MapPin, Key, User, Lock } from 'lucide-react';
 import { getDocument, updateDocument, COLLECTIONS } from '../../api/apiService';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 
 const Settings = () => {
   const { userData, updateLocalUserData } = useAuth();
+  const { showToast } = useDialog();
   const [settings, setSettings] = useState({
     schoolName: 'Shala ERP School',
     schoolEmail: 'admin@shalaerp.com',
@@ -20,8 +22,6 @@ const Settings = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -50,18 +50,16 @@ const Settings = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     // Password validation
     if (credentials.password) {
       if (credentials.password.length < 6) {
-        setError('Password must be at least 6 characters long.');
+        showToast('Password must be at least 6 characters long.', 'warning');
         setLoading(false);
         return;
       }
       if (credentials.password !== credentials.confirmPassword) {
-        setError('Passwords do not match.');
+        showToast('Passwords do not match.', 'error');
         setLoading(false);
         return;
       }
@@ -85,12 +83,11 @@ const Settings = () => {
         updateLocalUserData(updatePayload);
       }
 
-      setSuccess('Settings and Admin Credentials updated successfully!');
+      showToast('Settings & Admin Credentials saved!', 'success');
       setCredentials(prev => ({ ...prev, password: '', confirmPassword: '' }));
-      setTimeout(() => setSuccess(''), 4000);
     } catch (error) {
       console.error('Error saving settings:', error);
-      setError(error.message || 'Error updating settings.');
+      showToast(error.message || 'Error updating settings.', 'error');
     } finally {
       setLoading(false);
     }
@@ -105,19 +102,7 @@ const Settings = () => {
         </div>
       </div>
 
-      {success && (
-        <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100 flex items-center animate-fade-in">
-          <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-center animate-fade-in">
-          <div className="w-2.5 h-2.5 bg-red-500 rounded-full mr-3 animate-pulse"></div>
-          {error}
-        </div>
-      )}
+      {/* Settings Form */}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* School Profile */}

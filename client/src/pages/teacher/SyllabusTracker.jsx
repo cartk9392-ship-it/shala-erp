@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import {
   BookOpen, Plus, Trash2, CheckCircle2, Clock, Circle,
   ChevronDown, ChevronUp, RefreshCw, Edit3, X, BarChart2,
@@ -20,6 +21,7 @@ const STATUS = {
 
 export default function SyllabusTracker() {
   const { userData } = useAuth();
+  const { showToast, showConfirm } = useDialog();
   const myClass = userData?.classAssigned;
 
   const [syllabusMap, setSyllabusMap]   = useState({});
@@ -82,10 +84,11 @@ export default function SyllabusTracker() {
   };
 
   const addTopic = async () => {
-    if (!newTopic.name.trim()) { alert('Topic name required'); return; }
+    if (!newTopic.name.trim()) { showToast('Topic name required', 'warning'); return; }
     await save([...currentTopics, { topicId: uid(), order: currentTopics.length, ...newTopic, name: newTopic.name.trim() }]);
     setNewTopic({ name:'', chapter:'', status:'pending', dateCovered:'', notes:'' });
     setShowAddForm(false);
+    showToast('Topic added to syllabus!', 'success');
   };
 
   const updateField = async (topicId, field, value) => {
@@ -95,9 +98,27 @@ export default function SyllabusTracker() {
     await save(updated);
   };
 
-  const deleteTopic = async (topicId) => save(currentTopics.filter(t => t.topicId !== topicId));
+  const deleteTopic = async (topicId) => {
+    const ok = await showConfirm({
+      title: 'Delete Topic?',
+      message: 'Are you sure you want to delete this topic from the syllabus tracker?',
+      confirmText: 'Delete',
+      danger: true
+    });
+    if (!ok) return;
+    await save(currentTopics.filter(t => t.topicId !== topicId));
+    showToast('Topic deleted.', 'info');
+  };
 
   const doDeleteSubject = async (sub) => {
+    const ok = await showConfirm({
+      title: `Delete ${sub}?`,
+      message: `Are you sure you want to delete the subject "${sub}" and all its tracked topics? This action is permanent.`,
+      confirmText: 'Yes, Delete Subject',
+      danger: true
+    });
+    if (!ok) return;
+
     setSaving(true);
     try {
       const entry = syllabusMap[sub];
@@ -119,9 +140,13 @@ export default function SyllabusTracker() {
       const newList = subjectList.filter(s => s !== sub);
       setSubjectList(newList);
       setActiveSubject(newList.length > 0 ? newList[0] : '');
+      showToast(`Subject "${sub}" deleted successfully.`, 'success');
     } catch (err) {
       console.error('deleteSubject error:', err);
-    } finally { setSaving(false); }
+      showToast('Error deleting subject.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const addSubject = async () => {
@@ -133,6 +158,7 @@ export default function SyllabusTracker() {
     setSyllabusMap(prev => ({ ...prev, [sub]: { id: docId, topics: [] } }));
     setSubjectList(prev => [...prev, sub]);
     setActiveSubject(sub); setShowAddSub(false); setNewSubName(''); setSaving(false);
+    showToast(`Subject "${sub}" added successfully!`, 'success');
   };
 
   const cycleStatus = async (topic) => {

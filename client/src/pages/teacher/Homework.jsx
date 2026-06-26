@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, FileText, Trash2, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocumentsWhere, getDocuments, addDocument, updateDocument, deleteDocument, getDocument, setDocument, COLLECTIONS } from '../../api/apiService';
 
 const Homework = () => {
   const { userData } = useAuth();
+  const { showToast, showConfirm } = useDialog();
   const [homeworkList, setHomeworkList] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ subject: '', title: '', dueDate: '' });
@@ -65,13 +67,21 @@ const Homework = () => {
       
       setFormData({ subject: '', title: '', dueDate: '' });
       setShowForm(false);
-    } catch (e) { console.error(e); alert('Error saving homework.'); }
+    } catch (e) { console.error(e); showToast('Error saving homework.', 'error'); }
   };
 
   const handleDelete = async (id) => {
+    const ok = await showConfirm({
+      title: 'Delete Homework?',
+      message: 'This homework assignment will be permanently removed.',
+      confirmText: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteDocument(COLLECTIONS.HOMEWORK, id);
       setHomeworkList(prev => prev.filter(h => h.id !== id));
+      showToast('Homework deleted.', 'success');
     } catch (e) { console.error(e); }
   };
 
@@ -82,9 +92,9 @@ const Homework = () => {
   const saveStatus = async () => {
     try {
       await setDocument('homework_status', checkingHomework.id, { statuses: statusMap });
-      alert('Homework status updated successfully!');
+      showToast('Homework status saved! ✅', 'success');
       setCheckingHomework(null);
-    } catch (e) { console.error(e); alert('Error saving status.'); }
+    } catch (e) { console.error(e); showToast('Error saving status.', 'error'); }
   };
 
   if (checkingHomework) {

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Users, Trash2 } from 'lucide-react';
 import { getDocuments, getDocumentsWhere, addDocument, updateDocument, deleteDocument, COLLECTIONS } from '../../api/apiService';
+import { useDialog } from '../../context/DialogContext';
 
 const ManageClasses = () => {
+  const { showToast, showConfirm } = useDialog();
   const [classes, setClasses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
@@ -37,26 +39,27 @@ const ManageClasses = () => {
         if (t) await updateDocument(COLLECTIONS.USERS, t.id, { classAssigned: newClass.name });
       }
       setNewClass({ name: '', classTeacher: '' }); setShowForm(false);
-    } catch (e) { console.error(e); alert('Error creating class.'); }
+      showToast('Class created successfully!', 'success');
+    } catch (e) { console.error(e); showToast('Error creating class.', 'error'); }
   };
 
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
   const handleDelete = async (id, cn) => {
-    if (confirmDeleteId !== id) {
-      setConfirmDeleteId(id);
-      setTimeout(() => setConfirmDeleteId(null), 3000);
-      return;
-    }
+    const ok = await showConfirm({
+      title: `Delete Class ${cn}?`,
+      message: `Are you sure you want to delete Class "${cn}"? This will also remove student assignments for this class.`,
+      confirmText: 'Yes, Delete Class',
+      danger: true
+    });
+    if (!ok) return;
 
     try {
       await deleteDocument(COLLECTIONS.CLASSES, id);
       setClasses(p => p.filter(c => c.id !== id));
       setStudents(p => p.filter(s => s.class !== cn));
-      setConfirmDeleteId(null);
+      showToast(`Class "${cn}" deleted successfully.`, 'success');
     } catch (e) { 
       console.error(e); 
-      alert('Error deleting class: ' + (e.response?.data?.message || e.message));
+      showToast('Error deleting class: ' + (e.response?.data?.message || e.message), 'error');
     }
   };
 
@@ -88,13 +91,9 @@ const ManageClasses = () => {
           <div key={cls.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative group">
             <button 
               onClick={() => handleDelete(cls.id, cls.name)} 
-              className={`absolute top-4 right-4 p-2 rounded-lg transition-all ${
-                confirmDeleteId === cls.id 
-                  ? 'bg-red-500 text-white text-[10px] font-bold px-3 opacity-100' 
-                  : 'text-red-500 md:text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100'
-              }`}
+              className="absolute top-4 right-4 p-2 rounded-lg transition-all text-red-500 md:text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
-              {confirmDeleteId === cls.id ? 'Confirm?' : <Trash2 className="w-4 h-4" />}
+              <Trash2 className="w-4 h-4" />
             </button>
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">{cls.name.split(' ')[0]}</div>
             <h3 className="text-xl font-bold text-slate-800 mb-1">Class {cls.name}</h3>

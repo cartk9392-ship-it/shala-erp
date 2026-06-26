@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Lock, User } from 'lucide-react';
 
@@ -10,6 +11,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
+  const { showToast } = useDialog();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,9 +21,11 @@ const Login = () => {
     
     try {
       await login(username, password);
+      showToast('Welcome back! Logging in...', 'success');
       navigate('/'); 
     } catch (err) {
       setError('Invalid credentials. Please try again.');
+      showToast('Login Failed: Invalid credentials.', 'error');
       console.error(err);
     } finally {
       setLoading(false);

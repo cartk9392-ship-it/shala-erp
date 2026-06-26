@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Users, ClipboardList, BookOpen, Bell, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import { getDocuments, getDocumentsWhere, addDocument, updateDocument, COLLECTIONS } from '../api/apiService';
 
 const TeacherDashboard = () => {
   const { userData } = useAuth();
+  const { showToast } = useDialog();
   const [stats, setStats] = useState({
     myStudents: 0,
     attendanceToday: 0,
@@ -87,7 +89,7 @@ const TeacherDashboard = () => {
       });
       
       if (existing.length > 0) {
-        alert('Attendance already marked for today!');
+        showToast('Attendance already marked for today!', 'warning');
         setAllAttendance(existing);
         return;
       }
@@ -102,7 +104,7 @@ const TeacherDashboard = () => {
         const filtered = prev.filter(r => r.id !== docId);
         return [...filtered, savedDoc];
       });
-      alert('Attendance marked successfully!');
+      showToast('Attendance marked successfully!', 'success');
       setStats(prev => ({ ...prev, attendanceToday: 100 }));
     } catch (error) {
       console.error('Error marking attendance:', error);

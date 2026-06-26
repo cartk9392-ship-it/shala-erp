@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Award, Download, User, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocument, getDocuments, COLLECTIONS } from '../../api/apiService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const ViewResults = () => {
   const { userData } = useAuth();
+  const { showToast } = useDialog();
   const [examResults, setExamResults] = useState([]);
   const [selectedExam, setSelectedExam] = useState('');
   const [studentInfo, setStudentInfo] = useState(null);
@@ -126,7 +128,7 @@ const ViewResults = () => {
 
       doc.save(`${studentInfo?.name}_Result.pdf`);
     } catch (e) {
-      alert("Error generating PDF");
+      showToast('Error generating PDF', 'error');
     }
   };
 

@@ -3,10 +3,12 @@ import { Calendar as CalendarIcon, CheckCircle, XCircle, Download } from 'lucide
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { getDocumentsWhere, addDocument, updateDocument, getDocuments, COLLECTIONS } from '../../api/apiService';
 
 const Attendance = () => {
   const { userData } = useAuth();
+  const { showToast } = useDialog();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [students, setStudents] = useState([]);
 
@@ -44,13 +46,13 @@ const Attendance = () => {
     try {
       const docId = `${userData?.classAssigned}_${date}`;
       await updateDocument(COLLECTIONS.ATTENDANCE, docId, attendanceRecord);
-      alert('Attendance saved successfully!');
-    } catch (e) { console.error(e); alert('Error saving attendance.'); }
+      showToast('Attendance saved successfully!', 'success');
+    } catch (e) { console.error(e); showToast('Error saving attendance.', 'error'); }
   };
 
   const generateMonthlyReport = async () => {
     if (students.length === 0) {
-      alert("No students found to generate a report.");
+      showToast('No students found to generate a report.', 'warning');
       return;
     }
 
@@ -166,7 +168,7 @@ const Attendance = () => {
       doc.save(`Class_Register_${monthName}_${currentYear}.pdf`);
     } catch (error) {
       console.error("PDF Generation Error:", error);
-      alert("Error generating PDF. Check console for details.");
+      showToast('Error generating PDF. Check console for details.', 'error');
     }
   };
 

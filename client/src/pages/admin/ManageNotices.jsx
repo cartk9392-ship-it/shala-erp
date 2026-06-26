@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Bell, Trash2 } from 'lucide-react';
 import { getDocuments, addDocument, deleteDocument, COLLECTIONS } from '../../api/apiService';
+import { useDialog } from '../../context/DialogContext';
 
 const ManageNotices = () => {
+  const { showToast, showConfirm } = useDialog();
   const [notices, setNotices] = useState([]);
   const [newNotice, setNewNotice] = useState({ title: '', content: '', target: 'All' });
 
@@ -31,14 +33,22 @@ const ManageNotices = () => {
       const newDoc = await addDocument(COLLECTIONS.NOTICES, noticeData);
       setNotices(prev => [newDoc, ...prev]);
       setNewNotice({ title: '', content: '', target: 'All' });
-      alert('Notice sent successfully!');
-    } catch (e) { console.error(e); alert('Error sending notice.'); }
+      showToast('Notice sent successfully! 📢', 'success');
+    } catch (e) { console.error(e); showToast('Error sending notice.', 'error'); }
   };
 
   const handleDelete = async (id) => {
+    const ok = await showConfirm({
+      title: 'Delete Notice?',
+      message: 'This notice will be permanently removed.',
+      confirmText: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteDocument(COLLECTIONS.NOTICES, id);
       setNotices(prev => prev.filter(n => n.id !== id));
+      showToast('Notice deleted.', 'success');
     } catch (e) { console.error(e); }
   };
 
